@@ -1,1 +1,86 @@
-<p>landing works!</p>
+<div class="landing-page">
+  <!-- Top Nav for Guest -->
+  <header class="guest-header">
+    <button class="mobile-menu-btn"><lucide-icon [img]="Home" [size]="24"></lucide-icon></button>
+    <div class="logo">ALI <span class="text-gold">NAILS</span></div>
+    <div class="header-right">
+      <div class="profile-icon pink-gradient" [routerLink]="authService.isLoggedIn() ? '/appointments' : '/login'">
+        <lucide-icon [img]="User" [size]="20"></lucide-icon>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-card">
+      <img src="/assets/hero.png" alt="Nail Art Hero" class="hero-bg" />
+      <div class="hero-overlay">
+        <span class="badge pink-gradient">NUEVA COLECCIÓN</span>
+        <h1>Arte Exquisito para tus Manos</h1>
+        <p>Vive la máxima experiencia en cuidado de uñas con nuestras expertas.</p>
+        
+        @if (authService.isLoggedIn()) {
+          <button class="btn-primary-rect" [routerLink]="['/appointments']">
+            Ver mi Agenda <lucide-icon [img]="ChevronRight" [size]="18"></lucide-icon>
+          </button>
+        } @else {
+          <button class="btn-primary-rect" [routerLink]="['/login']">
+            Agendar Ahora <lucide-icon [img]="ChevronRight" [size]="18"></lucide-icon>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    @for (stat of stats; track stat.label) {
+      <div class="stat-card">
+        <div class="stat-icon pink-gradient"><lucide-icon [img]="stat.icon" [size]="24"></lucide-icon></div>
+        <span>{{ stat.label }}</span>
+      </div>
+    }
+  </section>
+
+  <!-- Services Highlights -->
+  <section class="services-highlights">
+    <div class="section-title">
+      <div>
+        <h2>Nuestros Servicios</h2>
+        <p>Tratamientos de lujo curados</p>
+      </div>
+      <a routerLink="/services" class="view-all">Ver Todos <span class="arrow">↗</span></a>
+    </div>
+
+    <div class="services-mini-grid">
+      @for (service of services; track service.identifier; let i = $index) {
+        <div class="service-mini-card">
+          <img [src]="getImage(i)" [alt]="service.name" />
+          <div class="mini-card-overlay">
+            <h3>{{ service.name }}</h3>
+            <p>Desde ${{ service.price | number:'1.0-0' }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Elite Club Banner -->
+  <section class="banner-section">
+    <div class="elite-banner pink-gradient-light">
+      <div class="banner-content">
+        <h3>Ali Elite Club</h3>
+        <p>Obtén un 20% de descuento en cada visita y acceso anticipado.</p>
+      </div>
+      <button class="btn-elite pink-gradient">Unirme</button>
+    </div>
+  </section>
+
+  <!-- Bottom Navigation (Mobile Aesthetic) -->
+  <footer class="bottom-nav mobile-only">
+    <a href="#" class="nav-item active"><lucide-icon [img]="Home" [size]="24"></lucide-icon><span>Inicio</span></a>
+    <a routerLink="/services" class="nav-item"><lucide-icon [img]="Scissors" [size]="24"></lucide-icon><span>Servicios</span></a>
+    <a routerLink="/appointments" class="nav-item"><lucide-icon [img]="Calendar" [size]="24"></lucide-icon><span>Citas</span></a>
+    <a routerLink="/login" class="nav-item"><lucide-icon [img]="User" [size]="24"></lucide-icon><span>Perfil</span></a>
+  </footer>
+</div>

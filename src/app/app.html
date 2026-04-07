@@ -1,16 +1,19 @@
-<div class="app-container" [class.sidebar-open]="isSidebarOpen">
-  <!-- Overlay for mobile -->
-  <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+<div class="app-wrapper" [class.admin-layout]="isAdminLayout()" [class.sidebar-open]="isSidebarOpen">
   
-  <app-sidebar [isOpen]="isSidebarOpen"></app-sidebar>
-  
-  <div class="main-content">
-    <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+  @if (isAdminLayout()) {
+    <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+    <app-sidebar [isOpen]="isSidebarOpen"></app-sidebar>
     
-    <main class="content-area">
+    <div class="main-content">
+      <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+      <main class="content-area">
+        <router-outlet></router-outlet>
+      </main>
+      <app-footer></app-footer>
+    </div>
+  } @else {
+    <main class="public-content">
       <router-outlet></router-outlet>
     </main>
-    
-    <app-footer></app-footer>
-  </div>
+  }
 </div>

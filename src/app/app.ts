@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, signal, effect } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { SidebarComponent } from './components/layout/sidebar/sidebar';
 import { HeaderComponent } from './components/layout/header/header';
 import { FooterComponent } from './components/layout/footer/footer';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,17 @@ import { CommonModule } from '@angular/common';
 export class App {
   protected readonly title = signal('ali-studio-front');
   isSidebarOpen = false;
+  isAdminLayout = signal(false);
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      // Show sidebar only for these internal routes
+      const adminRoutes = ['/appointments', '/services', '/settings'];
+      this.isAdminLayout.set(adminRoutes.some(route => event.urlAfterRedirects.startsWith(route)));
+    });
+  }
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
