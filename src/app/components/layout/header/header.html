@@ -1,0 +1,27 @@
+<header class="header glass-panel">
+  <div class="left-section">
+    <button class="menu-btn mobile-only" (click)="onMenuClick()">
+      <lucide-icon [img]="Menu" [size]="24"></lucide-icon>
+    </button>
+    
+    <div class="search-bar">
+      <lucide-icon [img]="Search" [size]="18" class="search-icon"></lucide-icon>
+      <input type="text" placeholder="Buscar..." />
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button class="action-btn desktop-only">
+      <lucide-icon [img]="Bell" [size]="20"></lucide-icon>
+      <span class="notification-indicator"></span>
+    </button>
+    
+    <div class="user-profile">
+      <div class="avatar pink-gradient">A</div>
+      <div class="user-info desktop-only">
+        <p class="name">Alicia Studio</p>
+        <p class="role">Admin</p>
+      </div>
+    </div>
+  </div>
+</header>

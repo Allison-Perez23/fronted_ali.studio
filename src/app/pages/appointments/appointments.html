@@ -1,0 +1,75 @@
+<div class="page-header">
+  <div class="header-content">
+    <h1 class="brand-font">Agenda de <span class="text-gold">Citas</span></h1>
+    <p>Gestiona los horarios y clientes en tiempo real</p>
+  </div>
+  <button class="btn-primary">+ Agendar Cita</button>
+</div>
+
+<div *ngIf="loading" class="loading-state card">
+  <div class="spinner"></div>
+  <p>Cargando agenda...</p>
+</div>
+
+<div *ngIf="error" class="error-state card">
+  <p>{{ error }}</p>
+  <button class="btn-outline" (click)="fetchAppointments()">Reintentar</button>
+</div>
+
+<div *ngIf="!loading && !error" class="appointments-table-container card">
+  <table class="appointments-table" *ngIf="appointments.length > 0; else emptyState">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Servicio</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (appt of appointments; track appt.identifier) {
+        <tr>
+          <td>
+            <div class="client-cell">
+              <div class="client-icon pink-gradient">
+                <lucide-icon name="user" [size]="14"></lucide-icon>
+              </div>
+              <span>{{ appt.client?.full_name || 'Cliente Externo' }}</span>
+            </div>
+          </td>
+          <td><span class="service-tag">{{ appt.service?.name || '-' }}</span></td>
+          <td>
+            <div class="date-cell">
+              <lucide-icon name="calendar" [size]="14"></lucide-icon>
+              {{ formatDate(appt.date_time) }}
+            </div>
+          </td>
+          <td>
+            <div class="time-cell">
+              <lucide-icon name="clock" [size]="14"></lucide-icon>
+              {{ formatTime(appt.date_time) }}
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(appt.status)">
+              {{ getStatusLabel(appt.status) }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn">
+              <lucide-icon name="more-vertical" [size]="18"></lucide-icon>
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <p>No hay citas programadas.</p>
+    </div>
+  </ng-template>
+</div>

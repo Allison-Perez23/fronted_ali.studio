@@ -1,0 +1,104 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  
+  .header-content h1 {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.appointments-table-container {
+  overflow-x: auto;
+  padding: 0;
+  border-radius: var(--radius-xl);
+  
+  /* Smooth horizontal scroll on mobile */
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+}
+
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* Force scroll on very small screens */
+  
+  th, td {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--bg-cream);
+  }
+  
+  thead th {
+    background: var(--bg-cream);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.client-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  
+  .client-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  
+  span {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+}
+
+.service-tag {
+  background: var(--soft-gold);
+  color: var(--dark-gold);
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.date-cell, .time-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  
+  &.bg-green { background: #10b981; }
+  &.bg-gold { background: var(--primary-gold); }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    
+    .header-content h1 {
+      font-size: 1.8rem;
+    }
+  }
+}
