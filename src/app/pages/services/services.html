@@ -1,53 +1,120 @@
-<div class="page-header">
-  <div class="header-content">
-    <h1 class="brand-font">Nuestros <span class="text-gold">Servicios</span></h1>
-    <p>Descubre los tratamientos exclusivos que tenemos para ti</p>
+<div class="services-page-container">
+  
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="brand-font">Gestión de <span class="text-gold">Servicios</span></h1>
+      <p>Administra el catálogo de servicios de Ali Studio</p>
+    </div>
+    <button class="btn-primary" (click)="openModal()">
+      <lucide-icon [img]="Plus" [size]="20"></lucide-icon>
+      Nuevo Servicio
+    </button>
   </div>
-  <button class="btn-primary">+ Nuevo Servicio</button>
-</div>
 
-<!-- Loading State -->
-<div *ngIf="loading" class="loading-state card">
-  <div class="spinner pink-gradient"></div>
-  <p>Cargando servicios...</p>
-</div>
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state card">
+    <div class="spinner pink-gradient"></div>
+    <p>Cargando servicios...</p>
+  </div>
 
-<!-- Error State -->
-<div *ngIf="!loading && error" class="error-state card">
-  <p>{{ error }}</p>
-  <button class="btn-primary" (click)="fetchServices()">Reintentar</button>
-</div>
+  <!-- Error State -->
+  <div *ngIf="!loading() && error()" class="error-state card">
+    <p>{{ error() }}</p>
+    <button class="btn-primary" (click)="fetchServices()">Reintentar</button>
+  </div>
 
-<!-- Data Display -->
-<div *ngIf="!loading && !error" class="services-container">
-  <div *ngIf="services.length > 0; else emptyState" class="services-grid">
-    @for (service of services; track service.identifier; let i = $index) {
-      <div class="service-card card">
-        <div class="service-icon" [ngClass]="getGradient(i)">
-          <lucide-icon name="scissors" [size]="28"></lucide-icon>
-        </div>
-        
-        <div class="service-details">
-          <h3>{{ service.name }}</h3>
-          <p class="description">{{ service.description }}</p>
+  <!-- Data Display -->
+  <div *ngIf="!loading() && !error()" class="services-layout">
+    <div *ngIf="services().length > 0; else emptyState" class="services-grid">
+      @for (service of services(); track service.identifier; let i = $index) {
+        <div class="service-card card glass-panel">
+          <div class="service-icon" [ngClass]="getGradient(i)">
+            <lucide-icon [img]="Sparkles" [size]="28"></lucide-icon>
+          </div>
           
-          <div class="service-meta">
-            <span class="price">${{ service.price | number:'1.0-0' }}</span>
-            <span class="duration">{{ service.duration_minutes }} min</span>
+          <div class="service-details">
+            <h3>{{ service.name }}</h3>
+            <p class="description">{{ service.description }}</p>
+            
+            <div class="service-meta">
+              <span class="price-tag gold-gradient">${{ service.price | number:'1.0-0' }}</span>
+              <span class="duration-tag">
+                <lucide-icon [img]="Clock" [size]="14"></lucide-icon>
+                {{ service.duration_minutes }} min
+              </span>
+            </div>
+          </div>
+          
+          <div class="service-actions">
+            <button class="btn-icon circle" (click)="openModal(service)" title="Editar">
+              <lucide-icon [img]="Pencil" [size]="18"></lucide-icon>
+            </button>
+            <button class="btn-icon circle delete" (click)="deleteService(service)" title="Eliminar">
+              <lucide-icon [img]="Trash2" [size]="18"></lucide-icon>
+            </button>
           </div>
         </div>
-        
-        <div class="service-actions">
-          <button class="btn-outline">Editar</button>
-          <button class="btn-text">Detalles</button>
-        </div>
-      </div>
-    }
-  </div>
-  
-  <ng-template #emptyState>
-    <div class="empty-state card">
-      <p>No se encontraron servicios registrados.</p>
+      }
     </div>
-  </ng-template>
+    
+    <ng-template #emptyState>
+      <div class="empty-state card glass-panel">
+        <lucide-icon [img]="Sparkles" [size]="48" class="text-gold"></lucide-icon>
+        <h3>No hay servicios</h3>
+        <p>Comienza agregando tu primer servicio al catálogo.</p>
+        <button class="btn-primary" (click)="openModal()">+ Agregar Servicio</button>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- SERVICE MODAL -->
+  <div *ngIf="isModalOpen()" class="modal-overlay">
+    <div class="modal-card card glass-panel fade-in">
+      <div class="modal-header">
+        <h2>{{ isEditMode() ? 'Editar' : 'Nuevo' }} <span class="text-gold">Servicio</span></h2>
+        <button class="close-btn" (click)="closeModal()"><lucide-icon [img]="X" [size]="24"></lucide-icon></button>
+      </div>
+
+      <form (submit)="saveService()" class="service-form">
+        <div class="form-group">
+          <label>Nombre del Servicio</label>
+          <div class="input-with-icon">
+            <lucide-icon [img]="Sparkles" [size]="18"></lucide-icon>
+            <input type="text" [value]="serviceForm.name()" (input)="serviceForm.name.set($any($event.target).value)" placeholder="Ej: Manicura Semi-permanente" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [value]="serviceForm.description()" (input)="serviceForm.description.set($any($event.target).value)" placeholder="Detalla en qué consiste el servicio..." rows="3"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio ($)</label>
+            <div class="input-with-icon">
+              <lucide-icon [img]="DollarSign" [size]="18"></lucide-icon>
+              <input type="number" [value]="serviceForm.price()" (input)="serviceForm.price.set(+$any($event.target).value)" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Duración (minutos)</label>
+            <div class="input-with-icon">
+              <lucide-icon [img]="Clock" [size]="18"></lucide-icon>
+              <input type="number" [value]="serviceForm.duration_minutes()" (input)="serviceForm.duration_minutes.set(+$any($event.target).value)" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-text" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="loading()">
+            {{ isEditMode() ? 'Guardar Cambios' : 'Crear Servicio' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>

@@ -1,28 +1,38 @@
-import { Service } from './service.model';
 import { User } from './user.model';
+import { Service } from './service.model';
 
 export enum AppointmentStatus {
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  CANCELLED = 'cancelled',
-  COMPLETED = 'completed'
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  CANCELLED = 'CANCELLED',
+  COMPLETED = 'COMPLETED'
 }
 
 export interface Appointment {
-  identifier: number;
-  client_id: number;
+  id?: number;
   service_id: number;
   employee_id?: number;
-  date_time: string;
-  status: string;
+  client_id?: number;
+  appointment_date: string; // ISO string
+  status?: AppointmentStatus;
+  notes?: string;
+  
+  // Optional relations
   client?: User;
-  service?: Service;
   employee?: User;
+  service?: Service;
 }
 
 export interface AppointmentCreate {
-  client_id: number;
   service_id: number;
   employee_id?: number;
-  date_time: string;
+  appointment_date: string;
+  notes?: string;
+}
+
+export interface AppointmentUpdate {
+  employee_id?: number;
+  appointment_date?: string;
+  status?: AppointmentStatus;
+  notes?: string;
 }

@@ -19,4 +19,12 @@ export class ServiceService {
   createService(service: any): Observable<Service> {
     return this.http.post<Service>(this.apiUrl, service);
   }
+
+  updateService(id: number, service: any): Observable<Service> {
+    return this.http.put<Service>(`${this.apiUrl}${id}`, service);
+  }
+
+  deleteService(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}${id}`);
+  }
 }

@@ -16,11 +16,13 @@
       <span class="notification-indicator"></span>
     </button>
     
-    <div class="user-profile" routerLink="/profile" style="cursor: pointer">
-      <div class="avatar pink-gradient">A</div>
+    <div class="user-profile" *ngIf="authService.currentUser() as user" routerLink="/profile" style="cursor: pointer">
+      <div class="avatar pink-gradient">
+        {{ user.first_name[0] }}{{ user.first_surname[0] }}
+      </div>
       <div class="user-info desktop-only">
-        <p class="name">Alicia Studio</p>
-        <p class="role">Admin</p>
+        <p class="name">{{ user.first_name }} {{ user.first_surname }}</p>
+        <p class="role">{{ user.role }}</p>
       </div>
     </div>
   </div>

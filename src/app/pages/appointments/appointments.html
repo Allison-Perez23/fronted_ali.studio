@@ -1,75 +1,320 @@
-<div class="page-header">
-  <div class="header-content">
-    <h1 class="brand-font">Agenda de <span class="text-gold">Citas</span></h1>
-    <p>Gestiona los horarios y clientes en tiempo real</p>
-  </div>
-  <button class="btn-primary">+ Agendar Cita</button>
-</div>
-
-<div *ngIf="loading" class="loading-state card">
-  <div class="spinner"></div>
-  <p>Cargando agenda...</p>
-</div>
-
-<div *ngIf="error" class="error-state card">
-  <p>{{ error }}</p>
-  <button class="btn-outline" (click)="fetchAppointments()">Reintentar</button>
-</div>
-
-<div *ngIf="!loading && !error" class="appointments-table-container card">
-  <table class="appointments-table" *ngIf="appointments.length > 0; else emptyState">
-    <thead>
-      <tr>
-        <th>Cliente</th>
-        <th>Servicio</th>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Estado</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (appt of appointments; track appt.identifier) {
-        <tr>
-          <td>
-            <div class="client-cell">
-              <div class="client-icon pink-gradient">
-                <lucide-icon name="user" [size]="14"></lucide-icon>
-              </div>
-              <span>ID: {{ appt.client_id }}</span>
-            </div>
-          </td>
-          <td><span class="service-tag">Servicio #{{ appt.service_id }}</span></td>
-          <td>
-            <div class="date-cell">
-              <lucide-icon name="calendar" [size]="14"></lucide-icon>
-              {{ formatDate(appt.date_time) }}
-            </div>
-          </td>
-          <td>
-            <div class="time-cell">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              {{ formatTime(appt.date_time) }}
-            </div>
-          </td>
-          <td>
-            <span class="status-badge" [ngClass]="getStatusClass(appt.status)">
-              {{ getStatusLabel(appt.status) }}
-            </span>
-          </td>
-          <td class="actions-cell">
-            <button class="action-btn">
-              <lucide-icon name="more-vertical" [size]="18"></lucide-icon>
-            </button>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+<div class="appointments-container">
   
-  <ng-template #emptyState>
-    <div class="empty-state">
-      <p>No hay citas programadas.</p>
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="brand-font">Gestión de <span class="text-gold">Agenda</span></h1>
+      <p>Administra las citas y turnos de Ali Studio</p>
     </div>
-  </ng-template>
+    <button class="btn-primary" (click)="openBookingAtDate(selectedDate())">
+      <lucide-icon [img]="Plus" [size]="20"></lucide-icon>
+      Nueva Cita
+    </button>
+  </div>
+
+  <div class="agenda-layout">
+    <!-- LEFT: CALENDAR PANEL -->
+    <div class="calendar-panel card glass-panel">
+      <div class="calendar-header">
+        <h2 class="month-label">{{ monthName() }}</h2>
+        <div class="nav-btns">
+          <button (click)="previousMonth()" class="nav-btn"><lucide-icon [img]="ChevronLeft" [size]="20"></lucide-icon></button>
+          <button (click)="nextMonth()" class="nav-btn"><lucide-icon [img]="ChevronRight" [size]="20"></lucide-icon></button>
+        </div>
+      </div>
+
+      <div class="calendar-grid">
+        <div class="weekday">Dom</div>
+        <div class="weekday">Lun</div>
+        <div class="weekday">Mar</div>
+        <div class="weekday">Mié</div>
+        <div class="weekday">Jue</div>
+        <div class="weekday">Vie</div>
+        <div class="weekday">Sáb</div>
+
+        @for (day of calendarDays(); track day.date) {
+          <div 
+            class="day-cell" 
+            [class.prev-next]="day.month !== 'current'"
+            [class.today]="day.isToday"
+            [class.selected]="day.isSelected"
+            (click)="selectDate(day.date)">
+            <span class="day-number">{{ day.day }}</span>
+            <div *ngIf="day.hasAppointments" class="appointment-dot"></div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- RIGHT: DAY DETAILS / DAILY AGENDA -->
+    <div class="schedule-panel card glass-panel">
+      <div class="schedule-header">
+        <div class="date-badge gold-gradient">
+          <span class="day">{{ selectedDate() | date:'dd' }}</span>
+          <span class="month">{{ selectedDate() | date:'MMM' | uppercase }}</span>
+        </div>
+        <div class="date-info">
+          <h3>{{ selectedDate() | date:'EEEE, d MMMM' }}</h3>
+          <p>{{ daySchedule().length }} citas programadas</p>
+        </div>
+      </div>
+
+      <div class="timeline-container">
+        <!-- Time Markers -->
+        <div class="timeline-hour-markers">
+          @for (hour of timeSlots; track hour) {
+            <div class="hour-marker">{{ hour }}</div>
+          }
+        </div>
+
+        <!-- Appointments Over Grid -->
+        <div class="timeline-content">
+          <div class="time-grid">
+            @for (hour of timeSlots; track hour) {
+              <div class="grid-row"></div>
+            }
+          </div>
+
+          <!-- Active Appointments -->
+          @for (app of daySchedule(); track app.id) {
+            <div 
+              class="appointment-block pink-gradient"
+              [style.top.px]="getTranslateY(app.appointment_date)"
+              [style.height.px]="60"
+              (click)="openAppointmentDetail(app)">
+              <div class="app-info">
+                <span class="app-time">{{ formatTime(app.appointment_date) }}</span>
+                <span class="app-client">{{ app.client?.first_name || 'Cliente' }}</span>
+                <span class="app-service">{{ app.service?.name }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKING MODAL (PORTAL) -->
+  <div *ngIf="isBookingModalOpen()" class="modal-overlay">
+    <div class="booking-modal card glass-panel fade-in">
+      <div class="modal-header">
+        <h3>{{ isEditMode() ? 'Editar Cita' : (bookingStep() === 4 ? 'Confirmar Cita' : 'Agendar Nueva Cita') }}</h3>
+        <button class="close-btn" (click)="closeModal()"><lucide-icon [img]="X" [size]="24"></lucide-icon></button>
+      </div>
+
+      <div class="step-indicator">
+        <div class="step" [class.active]="bookingStep() >= 1" [class.done]="bookingStep() > 1">1</div>
+        <div class="step-line"></div>
+        <div class="step" [class.active]="bookingStep() >= 2" [class.done]="bookingStep() > 2">2</div>
+        <div class="step-line"></div>
+        <div class="step" [class.active]="bookingStep() >= 3" [class.done]="bookingStep() > 3">3</div>
+        <div class="step-line"></div>
+        <div class="step" [class.active]="bookingStep() >= 4" [class.done]="bookingStep() > 4">4</div>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- STEP 1: SERVICE SELECTION -->
+        @if (bookingStep() === 1) {
+          <div class="step-content">
+            <h4>Selecciona el Servicio</h4>
+            <div class="services-chips">
+              @for (service of services(); track service.identifier) {
+                <div 
+                  class="service-chip" 
+                  [class.selected]="selectedService()?.identifier === service.identifier"
+                  (click)="selectService(service)">
+                  <span class="name">{{ service.name }}</span>
+                  <span class="price">${{ service.price | number }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- STEP 2: EMPLOYEE SELECTION -->
+        @if (bookingStep() === 2) {
+          <div class="step-content">
+            <h4>¿Quién te atenderá?</h4>
+            <div class="employee-grid">
+              @for (emp of employees(); track emp.identifier) {
+                <div 
+                  class="employee-card" 
+                  [class.selected]="selectedEmployee()?.identifier === emp.identifier"
+                  (click)="selectEmployee(emp)">
+                  <div class="emp-avatar pink-gradient">
+                    {{ emp.first_name[0] }}{{ emp.first_surname[0] }}
+                  </div>
+                  <span class="name">{{ emp.first_name }} {{ emp.first_surname }}</span>
+                  <span class="role">Especialista</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- STEP 3: DATE & TIME -->
+        @if (bookingStep() === 3) {
+          <div class="step-content">
+            <h4>Fecha y Hora</h4>
+            <p class="section-sub">{{ selectedDate() | date:'longDate' }}</p>
+            
+            <div class="time-slots-grid">
+              @for (slot of timeSlots; track slot) {
+                <button 
+                  class="time-slot" 
+                  [class.selected]="selectedTimeSlot() === slot"
+                  (click)="selectedTimeSlot.set(slot)">
+                  {{ slot }}
+                </button>
+              }
+            </div>
+
+            <div class="notes-area">
+              <label>Notas adicionales</label>
+              <textarea [(ngModel)]="notes" placeholder="Alguna instrucción especial..."></textarea>
+            </div>
+          </div>
+        }
+
+        <!-- STEP 4: SUMMARY -->
+        @if (bookingStep() === 4) {
+          <div class="step-content summary-view">
+            <div class="summary-card">
+              <div class="summary-item">
+                <lucide-icon [img]="Sparkles" [size]="20"></lucide-icon>
+                <div>
+                  <label>Servicio</label>
+                  <p>{{ selectedService()?.name }}</p>
+                </div>
+              </div>
+              <div class="summary-item">
+                <lucide-icon [img]="UserIcon" [size]="20"></lucide-icon>
+                <div>
+                  <label>Especialista</label>
+                  <p>{{ selectedEmployee()?.first_name }} {{ selectedEmployee()?.first_surname }}</p>
+                </div>
+              </div>
+              <div class="summary-item">
+                <lucide-icon [img]="CalendarIcon" [size]="20"></lucide-icon>
+                <div>
+                  <label>Fecha</label>
+                  <p>{{ selectedDate() | date:'dd MMMM, yyyy' }}</p>
+                </div>
+              </div>
+              <div class="summary-item">
+                <lucide-icon [img]="Clock" [size]="20"></lucide-icon>
+                <div>
+                  <label>Hora</label>
+                  <p>{{ selectedTimeSlot() }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="total-bar card gold-gradient">
+              <div class="total-info">
+                <span>Total a pagar</span>
+                <h3>${{ selectedService()?.price | number }}</h3>
+              </div>
+              <div class="duration-info">
+                <span>Duración</span>
+                <p>{{ selectedService()?.duration_minutes }} min</p>
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <div class="modal-footer">
+        <button *ngIf="bookingStep() > 1" (click)="bookingStep.set(bookingStep() - 1)" class="btn-text">Anterior</button>
+        <div class="spacer"></div>
+        <button 
+          *ngIf="bookingStep() < 4" 
+          [disabled]="(bookingStep() === 1 && !selectedService()) || (bookingStep() === 2 && !selectedEmployee()) || (bookingStep() === 3 && !selectedTimeSlot())"
+          (click)="bookingStep.set(bookingStep() + 1)" 
+          class="btn-primary">
+          Siguiente
+        </button>
+        <button 
+          *ngIf="bookingStep() === 4" 
+          (click)="confirmBooking()" 
+          [disabled]="loading()"
+          class="btn-primary">
+          {{ loading() ? 'Agendando...' : 'Confirmar y Agendar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- DETAIL / MANAGE MODAL -->
+  <div *ngIf="isDetailModalOpen() && selectedAppointment()" class="modal-overlay">
+    <div class="booking-modal detail-modal card glass-panel fade-in">
+      <div class="modal-header">
+        <h3>Detalles de la Cita</h3>
+        <button class="close-btn" (click)="closeDetailModal()"><lucide-icon [img]="X" [size]="24"></lucide-icon></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="summary-view">
+          <div class="summary-card">
+            <div class="summary-item">
+              <lucide-icon [img]="UserIcon" [size]="20"></lucide-icon>
+              <div>
+                <label>Cliente</label>
+                <p>{{ selectedAppointment()!.client?.first_name }} {{ selectedAppointment()!.client?.first_surname }}</p>
+                <span class="sub-text">{{ selectedAppointment()!.client?.email }}</span>
+              </div>
+            </div>
+            <div class="summary-item">
+              <lucide-icon [img]="Sparkles" [size]="20"></lucide-icon>
+              <div>
+                <label>Servicio</label>
+                <p>{{ selectedAppointment()!.service?.name }}</p>
+              </div>
+            </div>
+            <div class="summary-item">
+              <lucide-icon [img]="CalendarIcon" [size]="20"></lucide-icon>
+              <div>
+                <label>Fecha y Hora</label>
+                <p>{{ selectedAppointment()!.appointment_date | date:'dd MMMM, yyyy - HH:mm' }}</p>
+              </div>
+            </div>
+            <div class="summary-item">
+              <lucide-icon [img]="Clock" [size]="20"></lucide-icon>
+              <div>
+                <label>Especialista</label>
+                <p>{{ selectedAppointment()!.employee?.first_name }} {{ selectedAppointment()!.employee?.first_surname }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="status-box" [class]="selectedAppointment()!.status?.toLowerCase()">
+            <label>Estado de la Cita</label>
+            <div class="status-badge-big">
+              {{ selectedAppointment()!.status }}
+            </div>
+          </div>
+
+          <div *ngIf="selectedAppointment()!.notes" class="notes-display">
+            <label>Notas</label>
+            <p>{{ selectedAppointment()!.notes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer detail-actions">
+        <button (click)="deleteAppointment(selectedAppointment()!.id)" class="btn-icon-text delete">
+          <lucide-icon [img]="Trash2" [size]="18"></lucide-icon>
+          Eliminar
+        </button>
+        <div class="spacer"></div>
+        <button *ngIf="selectedAppointment()!.status !== 'CANCELLED'" (click)="cancelAppointment(selectedAppointment()!.id)" class="btn-outline">
+          Cancelar Cita
+        </button>
+        <button (click)="openEditAppointment(selectedAppointment()!)" class="btn-primary">
+          <lucide-icon [img]="Edit2" [size]="18"></lucide-icon>
+          Editar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
