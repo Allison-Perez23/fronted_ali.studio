@@ -36,10 +36,10 @@
               <div class="client-icon pink-gradient">
                 <lucide-icon name="user" [size]="14"></lucide-icon>
               </div>
-              <span>{{ appt.client?.full_name || 'Cliente Externo' }}</span>
+              <span>ID: {{ appt.client_id }}</span>
             </div>
           </td>
-          <td><span class="service-tag">{{ appt.service?.name || '-' }}</span></td>
+          <td><span class="service-tag">Servicio #{{ appt.service_id }}</span></td>
           <td>
             <div class="date-cell">
               <lucide-icon name="calendar" [size]="14"></lucide-icon>

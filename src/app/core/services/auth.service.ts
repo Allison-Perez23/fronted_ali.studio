@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/login/access-token`;
-  private readonly profileUrl = `${environment.apiUrl}/users/@me`; // Common pattern, let's check
+  private readonly profileUrl = `${environment.apiUrl}/users/me`;
   private readonly tokenKey = 'ali_studio_token';
   
   currentUser = signal<User | null>(null);
@@ -54,14 +54,20 @@ export class AuthService {
     const token = this.getToken();
     if (!token) {
       this.loading.set(false);
+      this.currentUser.set(null);
       return;
     }
 
-    // Attempt to fetch user profile if there's a token
-    // For now, if we don't have a @me endpoint, we'll just mock the fact we are in
-    // In a real app, we'd hit http://localhost:8000/api/v1/users/me
-    
-    this.loading.set(false);
-    // this.currentUser.set(...)
+    this.http.get<User>(this.profileUrl).subscribe({
+      next: (user) => {
+        this.currentUser.set(user);
+        this.loading.set(false);
+      },
+      error: () => {
+        // Token might be expired or invalid
+        this.logout();
+        this.loading.set(false);
+      }
+    });
   }
 }

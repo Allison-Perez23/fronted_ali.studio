@@ -1,5 +1,5 @@
-import { User } from './user.model';
 import { Service } from './service.model';
+import { User } from './user.model';
 
 export enum AppointmentStatus {
   PENDING = 'pending',
@@ -10,20 +10,19 @@ export enum AppointmentStatus {
 
 export interface Appointment {
   identifier: number;
-  date_time: string;
-  status: AppointmentStatus;
-  notes?: string;
   client_id: number;
-  employee_id: number;
   service_id: number;
+  employee_id?: number;
+  date_time: string;
+  status: string;
   client?: User;
-  employee?: User;
   service?: Service;
+  employee?: User;
 }
 
 export interface AppointmentCreate {
-  date_time: string;
+  client_id: number;
   service_id: number;
   employee_id?: number;
-  notes?: string;
+  date_time: string;
 }

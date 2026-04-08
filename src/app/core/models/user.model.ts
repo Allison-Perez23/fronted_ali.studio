@@ -1,15 +1,22 @@
 export enum UserRole {
-  ADMIN = 'admin',
-  EMPLOYEE = 'employee',
-  CLIENT = 'client'
+  ADMIN = 'ADMIN',
+  EMPLOYEE = 'EMPLOYEE',
+  CLIENT = 'CLIENT'
 }
 
 export interface User {
   identifier: number;
+  first_name: string;
+  last_name: string;
+  first_surname: string;
+  last_surname: string;
   email: string;
-  full_name: string;
   role: UserRole;
   is_active: boolean;
+  phone?: string;
+  birthday?: string;
+  address?: string;
+  password?: string; // Only for creation/updates
 }
 
 export interface Token {

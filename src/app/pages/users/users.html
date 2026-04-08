@@ -1,0 +1,85 @@
+<div class="users-container">
+  <div class="page-header">
+    <div class="header-info">
+      <h1 class="brand-font">Gestión de <span class="text-gold">Usuarios</span></h1>
+      <p>Administra clientes, empleadas y administradoras</p>
+    </div>
+    <button class="btn-primary">+ Nuevo Usuario</button>
+  </div>
+
+  <!-- Role Selector Tabs -->
+  <div class="role-tabs card">
+    <button 
+      class="tab-btn" 
+      [class.active]="currentView() === UserRole.ADMIN" 
+      (click)="loadUsersByRole(UserRole.ADMIN)">Administradoras</button>
+    <button 
+      class="tab-btn" 
+      [class.active]="currentView() === UserRole.EMPLOYEE" 
+      (click)="loadUsersByRole(UserRole.EMPLOYEE)">Empleadas</button>
+    <button 
+      class="tab-btn" 
+      [class.active]="currentView() === UserRole.CLIENT" 
+      (click)="loadUsersByRole(UserRole.CLIENT)">Clientes</button>
+  </div>
+
+  <div class="table-actions">
+    <div class="search-box">
+      <lucide-icon [img]="Search" [size]="18"></lucide-icon>
+      <input type="text" [value]="searchTerm()" (input)="onSearchChange($event)" placeholder="Buscar por nombre o email..." />
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="loading-state card">
+    <div class="spinner pink-gradient"></div>
+    <p>Cargando usuarios...</p>
+  </div>
+
+  <div *ngIf="!loading()" class="users-table-container card">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Nombre Completo</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of filteredUsers(); track u.identifier) {
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar pink-gradient">{{ u.first_name[0] }}</div>
+                <div class="user-names">
+                  <span class="full-name">{{ u.first_name }} {{ u.first_surname }}</span>
+                  <span class="sub-name">{{ u.last_name }}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.phone || '-' }}</td>
+            <td>
+              <span class="status-badge" [class.active]="u.is_active">
+                {{ u.is_active ? 'Activa' : 'Inactiva' }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button class="icon-btn edit" (click)="editUser(u)">
+                <lucide-icon [img]="Edit2" [size]="18"></lucide-icon>
+              </button>
+              <button class="icon-btn delete" (click)="deleteUser(u)">
+                <lucide-icon [img]="Trash2" [size]="18"></lucide-icon>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    
+    <div *ngIf="filteredUsers().length === 0" class="empty-results">
+      <p>No se encontraron usuarios en esta categoría.</p>
+    </div>
+  </div>
+</div>

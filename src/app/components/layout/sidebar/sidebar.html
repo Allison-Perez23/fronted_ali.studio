@@ -1,9 +1,12 @@
 <aside class="sidebar glass-panel">
   <div class="logo-container">
-    <h2 class="brand-font">Ali <span class="text-gold">Studio</span></h2>
+    <h2 class="brand-font">ALI <span class="text-gold">STUDIO</span></h2>
+    <button class="close-btn" (click)="close.emit()">
+      <lucide-icon [img]="X" [size]="20"></lucide-icon>
+    </button>
   </div>
 
-  <nav class="nav-section">
+  <nav class="nav-content">
     <ul class="nav-list">
       @for (item of menuItems; track item.label) {
         <li>
@@ -14,24 +17,23 @@
         </li>
       }
     </ul>
-  </nav>
 
-  <div class="nav-bottom">
-    <ul class="nav-list">
-      @for (item of bottomItems; track item.label) {
-        <li>
-          <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
-            <lucide-icon [img]="item.icon" [size]="20" class="icon"></lucide-icon>
-            <span>{{ item.label }}</span>
-          </a>
-        </li>
-      }
-      <li>
-        <button class="nav-link logout-btn">
-          <lucide-icon [img]="LogOut" [size]="20" class="icon"></lucide-icon>
-          <span>Salir</span>
-        </button>
-      </li>
-    </ul>
-  </div>
+    <div class="nav-bottom">
+      <ul class="nav-list">
+        @for (item of bottomItems; track item.label) {
+          <li>
+            <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
+              <lucide-icon [img]="item.icon" [size]="20" class="icon"></lucide-icon>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+
+      <button (click)="authService.logout()" class="nav-link logout-btn">
+        <lucide-icon [img]="LogOut" [size]="20" class="icon"></lucide-icon>
+        <span>Cerrar Sesión</span>
+      </button>
+    </div>
+  </nav>
 </aside>

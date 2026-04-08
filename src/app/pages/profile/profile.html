@@ -1,0 +1,196 @@
+<div class="profile-page">
+  <!-- Toast Feedback -->
+  <div *ngIf="toast().type" class="toast glass-panel" [class.success]="toast().type === 'success'" [class.error]="toast().type === 'error'">
+    <lucide-icon *ngIf="toast().type === 'success'" [img]="CheckCircle2" class="toast-icon"></lucide-icon>
+    <lucide-icon *ngIf="toast().type === 'error'" [img]="AlertCircle" class="toast-icon"></lucide-icon>
+    <span>{{ toast().message }}</span>
+  </div>
+
+  <div class="profile-header">
+    <div class="header-content">
+      <h1 class="brand-font">Mi <span class="text-gold">Perfil</span></h1>
+      <p>Administra tu información personal y seguridad de cuenta.</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="loading-container">
+    <div class="spinner"></div>
+    <p>Sincronizando tus datos...</p>
+  </div>
+
+  <div *ngIf="!loading() && user()" class="profile-content">
+    <!-- Sidebar / Navigation -->
+    <div class="profile-nav glass-panel">
+      <div class="user-summary">
+        <div class="avatar pink-gradient">
+          {{ user()?.first_name ? user()!.first_name[0] : '' }}{{ user()?.first_surname ? user()!.first_surname[0] : '' }}
+        </div>
+        <div class="user-info">
+          <h3>{{ user()?.first_name }} {{ user()?.first_surname }}</h3>
+          <span class="role-badge" [class]="user()?.role?.toLowerCase() || 'client'">{{ user()?.role }}</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button (click)="mode.set('view')" [class.active]="mode() === 'view'">
+          <lucide-icon [img]="UserIcon" class="nav-icon" [size]="20"></lucide-icon>
+          Vista General
+          <lucide-icon [img]="ChevronRight" class="arrow-icon" [size]="16"></lucide-icon>
+        </button>
+        <button (click)="enterEditMode()" [class.active]="mode() === 'edit'">
+          <lucide-icon [img]="Edit3" class="nav-icon" [size]="20"></lucide-icon>
+          Editar Perfil
+          <lucide-icon [img]="ChevronRight" class="arrow-icon" [size]="16"></lucide-icon>
+        </button>
+        <button (click)="enterPasswordMode()" [class.active]="mode() === 'password'">
+          <lucide-icon [img]="Lock" class="nav-icon" [size]="20"></lucide-icon>
+          Cambiar Contraseña
+          <lucide-icon [img]="ChevronRight" class="arrow-icon" [size]="16"></lucide-icon>
+        </button>
+        <div class="nav-divider"></div>
+        <button (click)="logout()" class="logout-btn">
+          <lucide-icon [img]="LogOut" class="nav-icon" [size]="20"></lucide-icon>
+          Cerrar Sesión
+        </button>
+      </nav>
+    </div>
+
+    <!-- Main Dynamic Section -->
+    <div class="profile-main">
+      
+      <!-- VIEW MODE -->
+      <div *ngIf="mode() === 'view'" class="card fade-in">
+        <div class="card-header">
+          <div class="header-icon-box gold-gradient">
+            <lucide-icon [img]="ShieldCheck" class="header-icon" [size]="28"></lucide-icon>
+          </div>
+          <div>
+            <h3>Información Personal</h3>
+            <p>Datos visibles de tu cuenta</p>
+          </div>
+        </div>
+
+        <div class="data-grid">
+          <div class="data-item">
+            <label><lucide-icon [img]="UserIcon" [size]="14"></lucide-icon> Nombre Completo</label>
+            <p>{{ user()?.first_name }} {{ user()?.last_name }} {{ user()?.first_surname }} {{ user()?.last_surname }}</p>
+          </div>
+          <div class="data-item">
+            <label><lucide-icon [img]="Mail" [size]="14"></lucide-icon> Correo Electrónico</label>
+            <p>{{ user()?.email }}</p>
+          </div>
+          <div class="data-item">
+            <label><lucide-icon [img]="Phone" [size]="14"></lucide-icon> Teléfono</label>
+            <p>{{ user()?.phone || 'No registrado' }}</p>
+          </div>
+          <div class="data-item">
+            <label><lucide-icon [img]="CalendarIcon" [size]="14"></lucide-icon> Fecha de Nacimiento</label>
+            <p>{{ user()?.birthday ? (user()!.birthday | date:'mediumDate') : 'No registrada' }}</p>
+          </div>
+          <div class="data-item full-width">
+            <label><lucide-icon [img]="MapPin" [size]="14"></lucide-icon> Dirección de Residencia</label>
+            <p>{{ user()?.address || 'No registrado' }}</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button (click)="enterEditMode()" class="btn-primary">
+            <lucide-icon [img]="Edit3" [size]="18"></lucide-icon>
+            Editar Información
+          </button>
+        </div>
+      </div>
+
+      <!-- EDIT MODE -->
+      <div *ngIf="mode() === 'edit'" class="card fade-in">
+        <div class="card-header">
+          <div class="header-icon-box pink-gradient">
+            <lucide-icon [img]="Edit3" class="header-icon" [size]="28"></lucide-icon>
+          </div>
+          <div>
+            <h3>Editar Información</h3>
+            <p>Actualiza tus datos de contacto y personales</p>
+          </div>
+        </div>
+
+        <form (ngSubmit)="saveProfile()" #editForm="ngForm" class="edit-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Primer Nombre</label>
+              <input type="text" [(ngModel)]="editData.first_name" name="fn" required />
+            </div>
+            <div class="form-group">
+              <label>Segundo Nombre</label>
+              <input type="text" [(ngModel)]="editData.last_name" name="ln" />
+            </div>
+            <div class="form-group">
+              <label>Primer Apellido</label>
+              <input type="text" [(ngModel)]="editData.first_surname" name="fs" required />
+            </div>
+            <div class="form-group">
+              <label>Segundo Apellido</label>
+              <input type="text" [(ngModel)]="editData.last_surname" name="ls" />
+            </div>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="text" [(ngModel)]="editData.phone" name="ph" />
+            </div>
+            <div class="form-group">
+              <label>Fecha de Nacimiento</label>
+              <input type="date" [(ngModel)]="editData.birthday" name="bd" />
+            </div>
+          </div>
+          
+          <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" [(ngModel)]="editData.address" name="addr" />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" (click)="cancelEdit()" class="btn-text">Cancelar</button>
+            <button type="submit" [disabled]="saving() || !editForm.valid" class="btn-primary">
+              <lucide-icon *ngIf="!saving()" [img]="CheckCircle2" [size]="18"></lucide-icon>
+              {{ saving() ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- PASSWORD MODE -->
+      <div *ngIf="mode() === 'password'" class="card fade-in">
+        <div class="card-header">
+          <div class="header-icon-box pink-gradient">
+            <lucide-icon [img]="Lock" class="header-icon" [size]="28"></lucide-icon>
+          </div>
+          <div>
+            <h3>Cambiar Contraseña</h3>
+            <p>Asegura tu cuenta con una nueva contraseña</p>
+          </div>
+        </div>
+
+        <form (ngSubmit)="changePassword()" #passForm="ngForm" class="edit-form">
+          <div class="form-group full-width">
+            <label>Contraseña Actual</label>
+            <input type="password" [(ngModel)]="passwordData.old_password" name="oldp" required />
+          </div>
+          <div class="form-group full-width">
+            <label>Nueva Contraseña</label>
+            <input type="password" [(ngModel)]="passwordData.new_password" name="newp" required minlength="6" />
+          </div>
+          <div class="form-group full-width">
+            <label>Confirmar Nueva Contraseña</label>
+            <input type="password" [(ngModel)]="passwordData.confirm_password" name="confp" required />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" (click)="cancelEdit()" class="btn-text">Cancelar</button>
+            <button type="submit" [disabled]="saving() || !passForm.valid || passwordData.new_password !== passwordData.confirm_password" class="btn-primary">
+              {{ saving() ? 'Actualizando...' : 'Actualizar Contraseña' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

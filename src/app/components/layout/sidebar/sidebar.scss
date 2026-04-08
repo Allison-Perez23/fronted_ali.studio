@@ -16,9 +16,27 @@
   padding: 1.5rem 0.5rem;
   border-bottom: 1px solid var(--glass-border);
   margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   
   h2 {
     font-size: 1.5rem;
+  }
+
+  .close-btn {
+    color: var(--primary-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: var(--soft-gold);
+      transform: rotate(90deg);
+    }
   }
 }
 
@@ -82,8 +100,15 @@
     border-radius: 0;
     transform: translateX(-100%);
   }
-  
-  :host-context(.sidebar-open) .sidebar {
-    transform: translateX(0);
+}
+
+/* Desktop toggle logic */
+@media (min-width: 1024px) {
+  .sidebar {
+    transform: translateX(-110%);
   }
+}
+
+:host-context(.sidebar-open) .sidebar {
+  transform: translateX(0);
 }

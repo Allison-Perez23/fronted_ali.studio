@@ -1,0 +1,132 @@
+.users-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.role-tabs {
+  display: flex;
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  gap: 0.5rem;
+  background: white;
+  border-radius: 1.2rem;
+  
+  .tab-btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    
+    &.active {
+      background: var(--soft-gold);
+      color: var(--dark-gold);
+    }
+  }
+}
+
+.table-actions {
+  margin-bottom: 1.5rem;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-sm);
+  max-width: 400px;
+  
+  input {
+    border: none;
+    background: none;
+    margin-left: 0.8rem;
+    width: 100%;
+    outline: none;
+  }
+}
+
+.users-table-container {
+  padding: 0;
+  overflow: hidden;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th {
+    text-align: left;
+    padding: 1.2rem 1.5rem;
+    background: var(--bg-cream);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--bg-cream);
+  }
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .user-names {
+    display: flex;
+    flex-direction: column;
+    .full-name { font-weight: 600; font-size: 0.95rem; }
+    .sub-name { font-size: 0.8rem; color: var(--text-muted); }
+  }
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #6b7280;
+  
+  &.active {
+    background: #ecfdf5;
+    color: #059669;
+  }
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  
+  &.edit { color: var(--primary-gold); &:hover { background: var(--soft-gold); } }
+  &.delete { color: #ef4444; &:hover { background: #fee2e2; } }
+}
+
+.empty-results {
+  padding: 4rem;
+  text-align: center;
+  color: var(--text-muted);
+}

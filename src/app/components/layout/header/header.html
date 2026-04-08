@@ -1,6 +1,6 @@
 <header class="header glass-panel">
   <div class="left-section">
-    <button class="menu-btn mobile-only" (click)="onMenuClick()">
+    <button class="menu-btn" (click)="onMenuClick()">
       <lucide-icon [img]="Menu" [size]="24"></lucide-icon>
     </button>
     
@@ -16,7 +16,7 @@
       <span class="notification-indicator"></span>
     </button>
     
-    <div class="user-profile">
+    <div class="user-profile" routerLink="/profile" style="cursor: pointer">
       <div class="avatar pink-gradient">A</div>
       <div class="user-info desktop-only">
         <p class="name">Alicia Studio</p>

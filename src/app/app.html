@@ -1,19 +1,26 @@
 <div class="app-wrapper" [class.admin-layout]="isAdminLayout()" [class.sidebar-open]="isSidebarOpen">
   
-  @if (isAdminLayout()) {
-    <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
-    <app-sidebar [isOpen]="isSidebarOpen"></app-sidebar>
-    
-    <div class="main-content">
-      <app-header (toggleSidebar)="toggleSidebar()"></app-header>
-      <main class="content-area">
-        <router-outlet></router-outlet>
-      </main>
-      <app-footer></app-footer>
+  @if (authService.loading()) {
+    <div class="global-loader">
+      <div class="spinner"></div>
+      <p class="brand-font">Iniciando Ali Studio...</p>
     </div>
   } @else {
-    <main class="public-content">
-      <router-outlet></router-outlet>
-    </main>
+    @if (isAdminLayout()) {
+      <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+      <app-sidebar [isOpen]="isSidebarOpen" (close)="toggleSidebar()"></app-sidebar>
+      
+      <div class="main-content">
+        <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+        <main class="content-area">
+          <router-outlet></router-outlet>
+        </main>
+        <app-footer></app-footer>
+      </div>
+    } @else {
+      <main class="public-content">
+        <router-outlet></router-outlet>
+      </main>
+    }
   }
 </div>
